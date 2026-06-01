@@ -1,4 +1,4 @@
-
+#from graphics import *
 import random
 
 # ---- CLASES ----
@@ -115,9 +115,8 @@ def player_turn(player, enemy):
         else:
             print(f"{key}. {name} (Damage: {value})")
     
-    choice = input("Enter 1, 2 or 3: ")
-    
     while True:
+        choice = input("Enter 1, 2 or 3: ")
         if choice == "3":
             return player.heal(choice)
         elif choice == "1" or choice == "2":
