@@ -1,4 +1,3 @@
-#from graphics import *
 import random
 
 # ---- CLASES ----
@@ -10,28 +9,34 @@ class Player:
         self.used_evasion = False
         
         if player_class == "Warrior":
-            self.health = 150
-            self.max_health = 150
+            self.health = 200
+            self.max_health = 200
             self.abilities = {
-                "1": ("Sword Strike", 25),
-                "2": ("Shield Bash", 40),
-                "3": ("Battle Cry", 15)  # heal
+                "1": ("Mortal Strike", 25), #ataque 1
+                "2": ("Heroic Strike", 40), #ataque 2
+                "3": ("Shield Block", 40),  #chance to block y heal
+                "4": ("Execute", 100),      #solamente se usa cuando tiene 20% de la vida 
+                "5": ("Info", 0)            #Es para mostrar la info de los ataques
             }
         elif player_class == "Mage":
-            self.health = 80
-            self.max_health = 80
-            self.abilities = {
-                "1": ("Fireball", 35),
-                "2": ("Arcane Blast", 55),
-                "3": ("Frost Nova", 20)  # heal
-            }
-        elif player_class == "Rogue":
             self.health = 100
             self.max_health = 100
             self.abilities = {
-                "1": ("Stab", 20),
-                "2": ("Backstab", 45),  # chance de critico
-                "3": ("Evasion", 10)  # heal
+                "1": ("Frostbolt", 45),   #ataque 1
+                "2": ("Arcane Blast", 60),#ataque 2
+                "3": ("Ice Barrier", 35), #chance de inmunidad mientras ataca
+                "4": ("Ice Block", 40),   #heal y evasion 100%
+                "5": ("Info", 0)          #Es para mostrar la info de los ataques
+            }
+        elif player_class == "Rogue":
+            self.health = 150
+            self.max_health = 150
+            self.abilities = {
+                "1": ("Sinister Strike", 30),  #ataque 1
+                "2": ("Slice and Dice", 45),   #ataque 2 con chance de critico
+                "3": ("Cloak of Shadows", 40), #chance de inmunidad mientras ataca
+                "4": ("Vanish", 40),           #heal y evasion 100%
+                "5": ("Info", 0)               #Es para mostrar la info de los ataques
             }
 
     def attack(self, ability_key, enemy):
@@ -169,4 +174,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
