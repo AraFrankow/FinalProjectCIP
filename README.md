@@ -29,7 +29,7 @@ Built as a Final Project for [Code in Place 2025](https://codeinplace.stanford.e
 1. Make sure you have Python 3 installed
 2. Clone the repository:
    ```
-   git clone https://github.com/AraFrankow/FinalProjectCIP.git
+   git clone https://github.com/AraFrankow/EchoesOfAzeroth-CIP.git
    ```
 3. Run the game:
    ```
