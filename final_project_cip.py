@@ -16,7 +16,7 @@ class Player:
                 "1": ("Mortal Strike", 25),
                 "2": ("Heroic Strike", 40),
                 "3": ("Execute", 100),
-                "4": ("Shield Block", 40 ),
+                "4": ("Shield Block", 40),
                 "5": ("Info", 0)
             }
         elif player_class == "Mage":
@@ -44,7 +44,7 @@ class Player:
         ability_name, damage = self.abilities["3"]
         self.used_immunity = True
         enemy.health -= damage
-        print(f"{ability_name} deals {damage} damage! 50% chance to dodge incoming attack!")
+        return f"{ability_name} deals {damage} damage! (50% chance to dodge incoming attack)"
 
     def attack(self, ability_key, enemy):
         ability_name, damage = self.abilities[ability_key]
@@ -52,22 +52,22 @@ class Player:
         
         if self.player_class == "Warrior" and ability_key == "3":
             if enemy.health <= verificar_vida:
-                print(f"EXECUTE! {ability_name} deals {damage} damage!")
                 enemy.health -= damage
+                return f"EXECUTE! {ability_name} deals {damage} damage!"
             else:
-                print(f"Execute can only be used when enemy is below 30% HP!")
-            return
+                return f"Execute can only be used when enemy is below 30% HP!"
 
         if self.player_class == "Rogue" and ability_key == "2":
             if random.random() < 0.4:
                 damage = damage * 2
-                print(f"CRITICAL HIT! {ability_name} deals {damage} damage!")
+                enemy.health -= damage
+                return f"CRITICAL HIT! {ability_name} deals {damage} damage!"
             else:
-                print(f"{ability_name} deals {damage} damage!")
-        else:
-            print(f"{ability_name} deals {damage} damage!")
-        
+                enemy.health -= damage
+                return f"{ability_name} deals {damage} damage!"
+
         enemy.health -= damage
+        return f"{ability_name} deals {damage} damage!"
 
     def heal(self, ability_key):
         heal_amounts = {
@@ -78,7 +78,7 @@ class Player:
         heal_amount = heal_amounts[self.player_class]
         self.health = min(self.health + heal_amount, self.max_health)
         self.used_evasion = True
-        print(f"You heal for {heal_amount} HP!")
+        return f"You heal for {heal_amount} HP!"
 
 
 class Enemy:
@@ -91,7 +91,6 @@ class Enemy:
     def attack(self, player):
         actual_damage = random.randint(self.damage - 5, self.damage + 5)
 
-        #heal y dodge
         if player.used_evasion:
             player.used_evasion = False
             dodge_chance = {
@@ -100,26 +99,23 @@ class Enemy:
                 "Rogue": 0.7
             }
             if random.random() < dodge_chance[player.player_class]:
-                print(f"Dodge!! No damage taken!")
-                return
+                return "Dodge!! No damage taken!"
 
-        #immunity
         if player.used_immunity:
             player.used_immunity = False
             if random.random() < 0.5:
-                print(f"Immune! No damage taken!")
-                return
+                return "Immune! No damage taken!"
 
-        print(f"{self.name} attacks you for {actual_damage} damage!")
         player.health -= actual_damage
+        return f"{self.name} attacks you for {actual_damage} damage!"
 
 # ---- LÓGICA DEL JUEGO ----
 
 def choose_class():
     print("Choose your class:")
-    print("1. Warrior (High HP, physical damage)")
-    print("2. Mage (Low HP, powerful spells)")
-    print("3. Rogue (Medium HP, chance of critical hit and chance of dodge)")
+    print("1. Warrior  - 200 HP | High physical damage | Execute & Shield Block")
+    print("2. Mage     - 100 HP | Powerful spells      | Ice Barrier & Ice Block")
+    print("3. Rogue    - 150 HP | Critical hits        | Cloak of Shadows & Vanish")
     
     while True:
         choice = input("Enter 1, 2 or 3: ")
@@ -133,82 +129,101 @@ def choose_class():
             print("Invalid option. Please enter 1, 2 or 3.")
 
 
-def show_status(player, enemy):
-    print(f"\n--- {player.name} ({player.player_class}) ---")
-    print(f"HP: {player.health}/{player.max_health}")
-    print(f"--- {enemy.name} ---")
-    print(f"HP: {enemy.health}/{enemy.max_health}")
-    print()
+def health_bar(current, max_hp):
+    filled = int((current / max_hp) * 10)
+    return "[" + "█" * filled + "░" * (10 - filled) + "]"
+
+
+def show_status(player, enemy, turn, messages=None):
+    print("\n" + "=" * 60)
+    print(f"{'⚔  TURN ' + str(turn) + '  ⚔':^60}")
+    print("=" * 60)
+    print(f"  {player.name} ({player.player_class})")
+    print(f"  HP: {player.health}/{player.max_health}  {health_bar(player.health, player.max_health)}")
+    print("-" * 60)
+    print(f"  {enemy.name}")
+    print(f"  HP: {enemy.health}/{enemy.max_health}  {health_bar(enemy.health, enemy.max_health)}")
+    if messages:
+        print("-" * 60)
+        for msg in messages:
+            print(f"  > {msg}")
+    print("=" * 60)
 
 
 def player_turn(player, enemy):
     while True:
         print("\nChoose your action:")
         for key, (name, value) in player.abilities.items():
-            if key == "3" or key == "4":
-                print(f"{key}. {name}")
-            elif key == "5":
-                print(f"{key}. {name}")
+            if key == "4" or key == "5":
+                print(f"  {key}. {name}")
             else:
-                print(f"{key}. {name} (Damage: {value})")
+                print(f"  {key}. {name} (Damage: {value})")
 
         choice = input("Enter 1-5: ")
 
         if choice == "5":
             print("\n=== ABILITIES INFO ===")
             if player.player_class == "Warrior":
-                print("1. Mortal Strike   - Deals 25 damage")
-                print("2. Heroic Strike   - Deals 40 damage")
-                print("3. Execute         - Deals 100 damage (only below 30% enemy HP)")
-                print("4. Shield Block    - heal 40 HP + 50% chance to block next attack")
+                print("  1. Mortal Strike  - Deals 25 damage")
+                print("  2. Heroic Strike  - Deals 40 damage")
+                print("  3. Execute        - Deals 100 damage (only below 30% enemy HP)")
+                print("  4. Shield Block   - Heal 40 HP + 50% chance to dodge next attack")
             elif player.player_class == "Mage":
-                print("1. Frostbolt       - Deals 45 damage")
-                print("2. Arcane Blast    - Deals 60 damage")
-                print("3. Ice Barrier     - 50% chance immune while attacking")
-                print("4. Ice Block       - Heal 50 HP + 100% dodge next attack")
+                print("  1. Frostbolt      - Deals 45 damage")
+                print("  2. Arcane Blast   - Deals 60 damage")
+                print("  3. Ice Barrier    - Deals 35 damage + 50% chance to dodge")
+                print("  4. Ice Block      - Heal 50 HP + 100% dodge next attack")
             elif player.player_class == "Rogue":
-                print("1. Sinister Strike - Deals 30 damage")
-                print("2. Slice and Dice  - Deals 45 damage (40% crit x2)")
-                print("3. Cloak of Shadows- 50% chance immune while attacking")
-                print("4. Vanish          - Heal 30 HP + 70% dodge next attack")
+                print("  1. Sinister Strike - Deals 30 damage")
+                print("  2. Slice and Dice  - Deals 45 damage (40% chance crit x2)")
+                print("  3. Cloak of Shadows- Deals 40 damage + 50% chance to dodge")
+                print("  4. Vanish          - Heal 30 HP + 70% dodge next attack")
             print("======================")
+
         elif choice in ["1", "2", "3", "4"]:
             if choice == "4":
-                player.heal(choice)
+                return player.heal(choice)
             elif choice == "3":
                 if player.player_class == "Warrior":
-                    player.attack("3", enemy)  # Execute
+                    return player.attack("3", enemy)
                 else:
-                    player.immunity_attack(enemy)  # Ice Barrier / Cloak of Shadows
+                    return player.immunity_attack(enemy)
             else:
-                player.attack(choice, enemy)
-            return
+                return player.attack(choice, enemy)
         else:
             print("Invalid option. Please enter 1-5.")
 
 
 def combat(player, enemy):
-    print(f"\nA wild {enemy.name} appears!\n")
+    turn = 1
+    print("\n" + "=" * 60)
+    print(f"  A wild {enemy.name} appears!")
+    print("=" * 60)
     
     while player.health > 0 and enemy.health > 0:
-        show_status(player, enemy)
-        player_turn(player, enemy)
+        show_status(player, enemy, turn)
+        player_msg = player_turn(player, enemy)
         
         if enemy.health <= 0:
-            print(f"\nYou defeated {enemy.name}!")
+            show_status(player, enemy, turn, [player_msg, f"You defeated {enemy.name}!"])
             return True
         
-        enemy.attack(player)
+        enemy_msg = enemy.attack(player)
+        show_status(player, enemy, turn, [player_msg, enemy_msg])
         
         if player.health <= 0:
-            print("\nYou died... Game Over.")
+            print("\n  You died... Game Over.")
             return False
+        
+        turn += 1
     
     return False
 
 
 def main():
-    print("=== WoW RPG ===\n")
+    print("=" * 60)
+    print(f"{'⚔  Echoes of Azeroth  ⚔':^60}")
+    print("=" * 60 + "\n")
     name = input("Enter your character's name: ")
     player_class = choose_class()
     player = Player(name, player_class)
@@ -224,10 +239,15 @@ def main():
         if not result:
             break
         if enemy.name != "Dragon":
-            print("\nPrepare for the next enemy...\n")
+            print("\n" + "=" * 60)
+            print("  Prepare for the next enemy...")
             player.health = min(player.health + 30, player.max_health)
+            print(f"  You recovered 30 HP! HP: {player.health}/{player.max_health}")
+            print("=" * 60)
     else:
-        print("\n=== You defeated all enemies! YOU WIN! ===")
+        print("\n" + "=" * 60)
+        print(f"{'🏆  YOU WIN!  🏆':^60}")
+        print("=" * 60)
 
 
 if __name__ == "__main__":
