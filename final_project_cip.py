@@ -7,6 +7,7 @@ class Player:
         self.name = name
         self.player_class = player_class
         self.used_evasion = False
+        self.used_immunity = False
         
         if player_class == "Warrior":
             self.health = 200
@@ -63,13 +64,15 @@ class Player:
         enemy.health -= damage
 
     def heal(self, ability_key):
-        _, heal_amount = self.abilities[ability_key]
+        heal_amounts = {
+            "Warrior": 40,
+            "Mage": 50,
+            "Rogue": 30
+        }
+        heal_amount = heal_amounts[self.player_class]
         self.health = min(self.health + heal_amount, self.max_health)
-        if self.player_class == "Rogue":
-            self.used_evasion = True
-            print(f"Evasion activated! 50% chance to dodge next attack!")
-        else:
-            print(f"You heal for {heal_amount} HP!")
+        self.used_evasion = True
+        print(f"You heal for {heal_amount} HP!")
 
 
 class Enemy:
@@ -81,13 +84,26 @@ class Enemy:
 
     def attack(self, player):
         actual_damage = random.randint(self.damage - 5, self.damage + 5)
-        
-        if player.player_class == "Rogue" and player.used_evasion:
-            if random.random() < 0.5:  # 50% de chance
-                print(f"Dodge!! No damage taken")
-                player.used_evasion = False  # se gasta por turno
+
+        # habilidad 4 - heal y dodge
+        if player.used_evasion:
+            player.used_evasion = False
+            dodge_chance = {
+                "Warrior": 0.5,
+                "Mage": 1.0,
+                "Rogue": 0.7
+            }
+            if random.random() < dodge_chance[player.player_class]:
+                print(f"Dodge!! No damage taken!")
                 return
-        
+
+        # habilidad 3 - inmunidad mientras atacas
+        if player.used_immunity:
+            player.used_immunity = False
+            if random.random() < 0.5:
+                print(f"Immune! No damage taken!")
+                return
+
         print(f"{self.name} attacks you for {actual_damage} damage!")
         player.health -= actual_damage
 
@@ -138,8 +154,8 @@ def player_turn(player, enemy):
             if player.player_class == "Warrior":
                 print("1. Mortal Strike   - Deals 25 damage")
                 print("2. Heroic Strike   - Deals 40 damage")
-                print("3. Shield Block    - 50% chance to block + heal 40 HP")
-                print("4. Execute         - Deals 100 damage (only below 30% enemy HP)")
+                print("3. Execute         - Deals 100 damage (only below 30% enemy HP)")
+                print("4. Shield Block    - heal 40 HP + 50% chance to block next attack")
             elif player.player_class == "Mage":
                 print("1. Frostbolt       - Deals 45 damage")
                 print("2. Arcane Blast    - Deals 60 damage")
@@ -154,8 +170,6 @@ def player_turn(player, enemy):
             # no gasta el turno, vuelve a mostrar las opciones
         elif choice in ["1", "2", "3", "4"]:
             if choice == "4":
-                player.attack(choice, enemy, player.name)
-            elif choice == "3":
                 player.heal(choice)
             else:
                 player.attack(choice, enemy, player.name)
