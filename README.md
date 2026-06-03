@@ -2,7 +2,7 @@
 
 A turn-based RPG game built in Python, inspired by World of Warcraft. Fight your way through three enemies — a Murloc, an Orc Warrior, and a Dragon — using unique class abilities and strategic decisions.
 
-Built as a Final Project for [Code in Place 2025](https://codeinplace.stanford.edu/) by Stanford University.
+Built as a Final Project for [Code in Place 2026](https://codeinplace.stanford.edu/) by Stanford University.
 
 ---
 
