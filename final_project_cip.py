@@ -206,24 +206,41 @@ def combat(player, enemy):
         
         if enemy.health <= 0:
             show_status(player, enemy, turn, [player_msg, f"You defeated {enemy.name}!"])
-            return True
+            return True, turn
         
         enemy_msg = enemy.attack(player)
         show_status(player, enemy, turn, [player_msg, enemy_msg])
         
         if player.health <= 0:
-            print("\n  You died... Game Over.")
-            return False
+            death_messages = {
+                "Murloc": "A Murloc got you... mrglglgl.",
+                "Orc Warrior": "The Orc Warrior crushed you without mercy.",
+                "Dragon": "The Dragon burned you to ashes... Game Over."
+            }
+            print(f"\n  {death_messages[enemy.name]}")
+            return False, turn
         
         turn += 1
     
-    return False
+    return False, turn
 
 
 def main():
     print("=" * 60)
     print(f"{'⚔  Echoes of Azeroth  ⚔':^60}")
     print("=" * 60 + "\n")
+    print()
+    print("  Welcome to Echoes of Azeroth!")
+    print()
+    print("  The lands of Azeroth are under threat.")
+    print("  Three enemies stand between you and victory:")
+    print("  a Murloc, an Orc Warrior, and a mighty Dragon.")
+    print()
+    print("  Choose your class wisely, use your abilities")
+    print("  strategically, and may the Light be with you.")
+    print()
+    print("=" * 60)
+    print()
     name = input("Enter your character's name: ")
     player_class = choose_class()
     player = Player(name, player_class)
@@ -234,8 +251,11 @@ def main():
         Enemy("Dragon", 200, 35)
     ]
     
+    total_turns = 0
+
     for enemy in enemies:
-        result = combat(player, enemy)
+        result, turns = combat(player, enemy)
+        total_turns += turns
         if not result:
             break
         if enemy.name != "Dragon":
@@ -247,6 +267,7 @@ def main():
     else:
         print("\n" + "=" * 60)
         print(f"{'🏆  YOU WIN!  🏆':^60}")
+        print(f"{'Completed in ' + str(total_turns) + ' turns!':^60}")
         print("=" * 60)
 
 
