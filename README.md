@@ -95,4 +95,4 @@ Built as a Final Project for [Code in Place 2026](https://codeinplace.stanford.e
 
 ## 📚 About
 
-This project was built as the Final Project for Code in Place 2025, a free introductory Python course by Stanford University. It demonstrates the use of classes, object-oriented programming, loops, conditionals, and functions.
+This project was built as the Final Project for Code in Place 2026, a free introductory Python course by Stanford University. It demonstrates the use of classes, object-oriented programming, loops, conditionals, and functions.
